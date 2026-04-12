@@ -1,0 +1,40 @@
+from pathlib import Path
+
+from app.core.config import get_settings
+from app.infra.db.schema import ensure_schema
+
+
+DEFAULT_VOCAB_LIBRARY = {
+    "items": [
+        {"key": "apple", "text": "apple", "meaning": "苹果", "category": "food", "difficulty": "starter", "tags": ["food", "snack"], "sample_sentence": "I see an apple."},
+        {"key": "milk", "text": "milk", "meaning": "牛奶", "category": "food", "difficulty": "starter", "tags": ["drink", "food"], "sample_sentence": "I drink milk."},
+        {"key": "hungry", "text": "hungry", "meaning": "饿的", "category": "feeling", "difficulty": "starter", "tags": ["feeling"], "sample_sentence": "I am hungry."},
+        {"key": "carrot", "text": "carrot", "meaning": "胡萝卜", "category": "food", "difficulty": "starter", "tags": ["food"], "sample_sentence": "The rabbit eats a carrot."},
+        {"key": "rabbit", "text": "rabbit", "meaning": "兔子", "category": "animal", "difficulty": "starter", "tags": ["animal", "pet"], "sample_sentence": "The rabbit is cute."},
+        {"key": "cat", "text": "cat", "meaning": "猫", "category": "animal", "difficulty": "starter", "tags": ["animal", "pet"], "sample_sentence": "The cat is happy."},
+        {"key": "ball", "text": "ball", "meaning": "球", "category": "toy", "difficulty": "starter", "tags": ["play", "toy"], "sample_sentence": "I play with a ball."},
+        {"key": "happy", "text": "happy", "meaning": "开心的", "category": "feeling", "difficulty": "starter", "tags": ["feeling"], "sample_sentence": "I am happy."},
+        {"key": "sleep", "text": "sleep", "meaning": "睡觉", "category": "action", "difficulty": "starter", "tags": ["bedtime", "action"], "sample_sentence": "The pet can sleep."},
+        {"key": "wash", "text": "wash", "meaning": "清洗", "category": "action", "difficulty": "starter", "tags": ["care", "action"], "sample_sentence": "We wash the pet."},
+        {"key": "good_night", "text": "good night", "meaning": "晚安", "kind": "phrase", "category": "bedtime", "difficulty": "starter", "tags": ["phrase", "bedtime"], "sample_sentence": "Good night, Ellie."},
+        {"key": "thank_you", "text": "thank you", "meaning": "谢谢你", "kind": "phrase", "category": "social", "difficulty": "starter", "tags": ["phrase", "social"], "sample_sentence": "Thank you, Ellie."}
+    ]
+}
+
+
+def bootstrap_app() -> None:
+    import json
+
+    settings = get_settings()
+    Path(settings.asset_dir).mkdir(parents=True, exist_ok=True)
+    Path(settings.database_path).parent.mkdir(parents=True, exist_ok=True)
+    ensure_schema(settings.database_path)
+
+    settings.vocab_library_file.parent.mkdir(parents=True, exist_ok=True)
+    if not settings.vocab_library_file.exists():
+        settings.vocab_library_file.write_text(json.dumps(DEFAULT_VOCAB_LIBRARY, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    bootstrap_app()
+    print("[OK] HappyEllie bootstrapped")
