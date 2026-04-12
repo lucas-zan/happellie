@@ -1,6 +1,6 @@
-# HappyEllie Runnable AI Starter
+# HappyEllie Runnable AI Game Prototype
 
-HappyEllie is a lightweight pet-based English learning prototype.
+HappyEllie is a lightweight pet-based English learning game prototype.
 This repo is designed for **fast experimentation with real AI providers** while
 keeping every capability behind simple, swappable interfaces.
 
@@ -15,10 +15,36 @@ keeping every capability behind simple, swappable interfaces.
 
 - uses a **real OpenAI-compatible model pipeline** once you configure your own model
 - supports a two-stage content flow: **lesson planning -> final lesson package generation**
+- generates a **page-based mini game package** instead of a flat lesson preview
+- renders a whitelisted set of **game pages and game components** in the frontend
+- carries a **story thread** across lessons with recap, mission, and next hook
+- introduces **helper animals and soft monster encounters** in the lesson flow
 - updates the learner profile after each session using **AI profile analysis**
 - keeps pet state independent from lesson generation
 - records trial usage and AI cost metadata for the admin panel
 - stays runnable without a model when `AI_ENABLE_FALLBACK=true`
+
+## Current product shape
+
+The current playable loop is:
+
+1. choose a few vocabulary items
+2. generate a story-driven lesson package
+3. play through page-based mini game screens
+4. save rewards and update the learner profile
+5. feed Ellie with earned food
+
+The current page flow is:
+
+- `hero`
+- `learn`
+- `quiz`
+- `repeat`
+- `settlement`
+- `feed_pet`
+
+The package is generated as **structured JSON**, not model-generated HTML or frontend code.
+The frontend renders only known page and component types.
 
 ## Stack
 
@@ -76,11 +102,17 @@ Frontend: `http://127.0.0.1:5173`
 ./scripts/run_local_app.sh
 ```
 
+Or use the root Makefile:
+
+```bash
+make dev
+```
+
 ## Default trial flow
 
 1. Open **Lesson**.
 2. Generate a lesson for `student-demo`.
-3. Complete the lesson to save rewards and update the profile.
+3. Play through the story pages and complete the lesson.
 4. Open **Pet** and feed Ellie.
 5. Open **Admin** to inspect sessions, AI calls, and tracked costs.
 
@@ -131,7 +163,12 @@ After bootstrap:
 
 ## Future extension points
 
-- real TTS provider
-- richer lesson block types
-- more detailed pet growth units
-- mobile-specific shell on top of the same APIs
+See [docs/STATUS_AND_NEXT_STEPS.md](/Users/lucas/Documents/products/happyellie/docs/STATUS_AND_NEXT_STEPS.md:1) for the active status and next tasks.
+
+The highest-priority next steps are:
+
+- fixed visual asset system for Ellie, helper animals, and monsters
+- richer game interactions such as drag, listen-pick, and collectible moments
+- stronger pet growth units and persistent avatar state
+- real TTS provider and audio playback experience
+- finer-grained event logging and profile recompute jobs

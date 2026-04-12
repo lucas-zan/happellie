@@ -45,6 +45,8 @@ The lesson experience now uses a page renderer plus whitelisted component render
 
 - `PageRenderer`
 - `hero_banner`
+- `story_panel`
+- `encounter_card`
 - `word_card`
 - `choice_quiz`
 - `repeat_prompt`
@@ -53,6 +55,21 @@ The lesson experience now uses a page renderer plus whitelisted component render
 - `pet_reaction`
 
 This keeps gameplay rendering contract-driven instead of relying on model-generated UI code.
+
+## Current implementation status
+
+Completed:
+
+- page-based lesson player
+- whitelisted component rendering
+- story recap panel rendering
+- helper-animal / monster encounter card rendering
+
+Next:
+
+- fixed visual asset rendering for Ellie and all story characters
+- more expressive transitions and reward animation
+- additional interaction components such as drag and listen-pick
 
 ## Design rule
 

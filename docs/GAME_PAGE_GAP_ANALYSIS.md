@@ -1,18 +1,38 @@
 # HappyEllie 游戏页面生成差距说明
 
+## 状态快照
+
+以下能力已经完成：
+
+- `LessonPackage` 已从扁平 `blocks` 升级为 `pages + components`
+- 前端已实现页面级渲染器
+- 已有可游玩的分页流程：`hero -> learn -> quiz -> repeat -> settlement -> feed_pet`
+- 模型/规则生成结果仍然是结构化 JSON，不是任意 HTML
+- 已接入轻量剧情线，可根据上一课的剧情状态延续下一课
+- 已加入伙伴动物和柔和怪物遭遇卡
+
+以下能力仍未完成：
+
+- 固定宠物与角色视觉素材系统
+- 更强的互动机制，如拖拽、听音选图、收集玩法
+- 细粒度页面事件流和后台重分析 job
+- 更完整的奖励演出和宠物成长单元
+
+本文件下面的“差距”内容保留，作为下一阶段的设计参考。
+
 ## 背景
 
-当前项目已经实现了一个可运行的首版闭环：
+当前项目已经实现了一个可运行的闭环：
 
 1. 选择一组单词
-2. 后端生成一个简化版课程包
-3. 前端按固定 block 渲染
+2. 后端生成一个分页课程/游戏包
+3. 前端按固定页面和组件合同渲染
 4. 提交结果后发放 food / coin
 5. 喂宠物并查看画像与统计
 
-这套实现能证明“学习 -> 奖励 -> 喂养”的基本链路，但还没有达到“为低年级小朋友生成一个真正可玩的游戏页面”的目标。
+这套实现已经证明“学习 -> 奖励 -> 喂养 -> 下次剧情延续”的基本链路，但还没有达到“完整低龄儿童英语剧情游戏”的目标。
 
-当前点击“生成课程”后，实际生成的是一个 `LessonPackage.blocks` 列表，而不是一个页面级的游戏包。前端也只是把这些 block 顺序展示出来，还没有页面状态机、游戏反馈节奏、页面资源加载和更丰富的互动组件。
+当前点击“生成课程”后，已经会返回页面级游戏包并进入分页游玩流程。但仍缺完整角色视觉系统、更丰富玩法和更强的剧情分支能力。
 
 ## 目标定义
 
@@ -38,93 +58,45 @@
 
 ## 当前实现与目标的核心差距
 
-### 1. 课程合同还不是页面级 DSL
+### 1. 固定视觉资产体系还未完成
 
-当前后端输出的是扁平 `blocks`：
-
-- `vocab_intro`
-- `audio_choice`
-- `repeat_after_me`
-- `reward_summary`
-- `feed_pet`
-
-这只能表达“有哪些教学块”，还不能表达：
-
-- 一节课由几页组成
-- 每页是什么类型
-- 每页有哪些组件
-- 每页完成后进入哪一页
-- 哪些组件需要播放音频
-- 哪些组件会提交答题事件
+页面级 DSL 已完成，当前差距不在合同本身，而在视觉资产层。
 
 需要补齐：
 
-- `pages[]` 级别的数据结构
-- `page_type`，如 `hero / learn / quiz / repeat / settlement / feed_pet`
-- `components[]` 级别的数据结构
-- `page_complete_action`
-- `validation` 字段
-- `package_version / blueprint_id / input_hash / prompt_version / model_name`
+- `base_avatar_key`
+- 伙伴动物固定形象 key
+- 怪物固定形象 key
+- 角色分层素材
+- 表情和成长状态的渲染规则
 
-建议目标结构：
+目标是保证剧情延续时，Ellie、伙伴和怪物都保持稳定识别度。
 
-```json
-{
-  "package_id": "lesson_20260412_ab12",
-  "package_version": "lesson_package_v1",
-  "student_id": "stu_001",
-  "pet_id": "pet_rabbit_01",
-  "theme": "feed_rabbit",
-  "pages": [
-    {
-      "page_id": "p1",
-      "page_type": "hero",
-      "title": "兔兔肚子饿啦",
-      "components": [
-        { "type": "hero_banner" }
-      ]
-    }
-  ]
-}
-```
+### 2. 前端仍缺更强的游戏演出层
 
-### 2. 前端还没有“游戏页面渲染器”
-
-当前前端有 `BlockRenderer`，但没有页面级渲染器，也没有真正的游戏状态机。
+当前前端已有 `PageRenderer` 和分页推进逻辑，但演出仍偏轻。
 
 需要补齐：
 
-- `LessonPageRenderer`
-- `PageRenderer`
-- `ComponentRenderer`
-- 页面切换状态机
-- 当前页完成条件判断
-- 过关反馈和转场动画
-- 页面级资源预加载
+- 页面转场动画
+- 结算动画
+- 角色反应动画
+- 页面资源预加载
+- 更明确的低龄化视觉节奏
 
-建议前端新增的渲染层：
+### 3. 互动组件仍然偏少，不足以构成更强游戏感
 
-- `renderers/page/PageRenderer.tsx`
-- `renderers/component/ComponentRenderer.tsx`
-- `features/lesson-player/*`
-- `stores/lessonPlayerStore.ts`
-
-### 3. 互动组件太少，不足以构成“游戏感”
-
-当前只有很少的 block，对低年级孩子来说更像课程预览，不像游戏。
+当前已有剧情、遭遇、选择、跟读、奖励、喂食，但互动深度还不够。
 
 至少应补齐这些组件类型：
 
-- `hero_banner`
-- `word_card`
-- `choice_quiz`
 - `listen_pick`
 - `drag_match`
-- `repeat_after_me`
-- `reward_panel`
-- `feed_panel`
 - `result_badge`
 - `pet_reaction`
+- `collect_item`
+- `story_choice`
+- `mini_battle_prompt`
 
 每个组件需要定义：
 
@@ -134,15 +106,16 @@
 - 是否上报事件
 - 是否依赖音频 / 图片资源
 
-### 4. 课程生成链路还过于固定
+### 4. 课程生成链路仍然过于固定
 
-当前模型虽然已经接上，但 planner 和 generator 仍被限制在固定的 5 个 block 顺序里，生成空间很小。
+当前虽然已经是页面包，但主流程仍然基本固定在 6 页线性顺序里，剧情变化还不够大。
 
 需要补齐：
 
-- `LessonBlueprint` 从 block 级升级到 page plan 级
-- planner 输出“页结构 + 组件类型 + 目标词 + 奖励计划”
-- generator 输出“每页文案 + 组件 payload + 反馈语”
+- 更丰富的 page plan 组合
+- 剧情节奏模板
+- 怪物/伙伴的章节变化
+- 更灵活的奖励节奏
 - package 生成后做 schema 校验
 - 未通过校验时回退到缓存或安全模板
 
@@ -155,7 +128,7 @@
 5. cache 存储 package
 6. frontend 渲染 package
 
-### 5. 学习过程缺少细粒度事件采集
+### 5. 学习过程仍缺少细粒度事件采集
 
 当前只有课程完成时统一提交 `block_results`，还没有页面级、组件级事件流。
 
@@ -196,7 +169,7 @@
 }
 ```
 
-### 6. 奖励和宠物联动还不够细
+### 6. 奖励和宠物联动仍不够细
 
 当前奖励能发放，但“游戏页面 -> 奖励面板 -> 喂食 -> 成长反馈”的演出不够完整。
 
@@ -217,7 +190,7 @@
 - 返回最新宠物快照
 - 前端按快照显示宠物反馈
 
-### 7. 宠物模型还不够支撑“形象一致 + 成长单元”
+### 7. 宠物模型仍不够支撑“形象一致 + 成长单元”
 
 当前宠物只有：
 
