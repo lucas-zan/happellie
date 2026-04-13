@@ -7,6 +7,7 @@ from uuid import uuid4
 from pydantic import BaseModel, Field
 
 LESSON_PACKAGE_VERSION = "lesson_package_v2"
+LESSON_PACKAGE_VERSION_V3 = "lesson_package_v3"
 
 PageType = Literal["hero", "learn", "quiz", "repeat", "settlement", "feed_pet"]
 ComponentType = Literal[
@@ -19,6 +20,26 @@ ComponentType = Literal[
     "reward_panel",
     "feed_panel",
     "pet_reaction",
+]
+
+TemplateId = Literal[
+    # narrative
+    "story_dialogue",
+    "story_choice",
+    "mission_briefing",
+    # learn
+    "word_reveal",
+    "word_in_scene",
+    # practice
+    "listen_pick",
+    "drag_match",
+    "choice_battle",
+    "sentence_puzzle",
+    "speak_repeat",
+    # reward
+    "reward_chest",
+    "feed_pet_step",
+    "episode_end",
 ]
 
 
@@ -52,11 +73,14 @@ class StoryCharacter(BaseModel):
 
 class StoryThread(BaseModel):
     arc_key: str = "snack_scouts"
+    chapter_key: str = "chapter_1"
     episode_index: int = 1
     episode_title: str = "Episode 1: Snack Scouts"
     recap: str = "Ellie started a tiny snack adventure."
     current_mission: str = "Help Ellie find today's snack."
     next_hook: str = "A new friend may appear in the next lesson."
+    last_choice_key: str = ""
+    last_choice_tag: str = ""
     characters: list[StoryCharacter] = Field(default_factory=list)
 
 
@@ -99,6 +123,15 @@ class LessonBlueprint(BaseModel):
         return sha256(raw.encode("utf-8")).hexdigest()
 
 
+class GameStep(BaseModel):
+    step_id: str
+    template_id: TemplateId
+    title: str = ""
+    slots: dict = Field(default_factory=dict)
+    is_interactive: bool = False
+    reward_on_complete: dict = Field(default_factory=dict)
+
+
 class LessonPackage(BaseModel):
     package_version: str = LESSON_PACKAGE_VERSION
     lesson_id: str
@@ -111,6 +144,8 @@ class LessonPackage(BaseModel):
     target_vocab_items: list[VocabItem] = Field(default_factory=list)
     story: StoryThread = Field(default_factory=StoryThread)
     pages: list[LessonPage] = Field(default_factory=list)
+    # v3: step-based gameplay contract. kept optional for backwards compatibility.
+    steps: list[GameStep] = Field(default_factory=list)
     reward_preview: dict = Field(default_factory=dict)
     focus_tags: list[str] = Field(default_factory=list)
     teacher_note: str = ""

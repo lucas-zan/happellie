@@ -7,6 +7,8 @@ from app.domain.interfaces.session import SessionRepository
 from app.domain.interfaces.tts import TextToSpeechProvider
 from app.domain.interfaces.vocab import VocabRepository
 from app.schemas.lesson import LessonRequest, LessonResponse
+from app.schemas.profile import ProfileSnapshot
+from app.infra.validation.step_validator import validate_steps
 
 
 class LessonService:
@@ -36,6 +38,7 @@ class LessonService:
 
     def plan_next_lesson(self, payload: LessonRequest) -> LessonResponse:
         profile = self._session_repo.get_profile(payload.student_id)
+        profile = self._apply_story_state(profile, payload.student_id)
         vocab_bank = self._vocab_repo.get_by_keys(payload.requested_vocab) if payload.requested_vocab else self._vocab_repo.list_vocab()
         try:
             blueprint = self._lesson_planner.plan(payload, profile, vocab_bank)
@@ -71,6 +74,9 @@ class LessonService:
                 metadata={"student_id": payload.student_id, "provider": "local", "error": str(exc)[:180]},
             )
 
+        # Validate step-based payloads (v3). Keep pages compatibility.
+        lesson.steps = validate_steps(getattr(lesson, "steps", []) or [])
+
         for page in lesson.pages:
             for component in page.components:
                 if component.type not in {"word_card", "choice_quiz", "repeat_prompt", "hero_banner", "story_panel", "encounter_card"}:
@@ -87,3 +93,20 @@ class LessonService:
         if cache_key:
             self._content_repo.save_cached_lesson(cache_key, lesson)
         return LessonResponse(lesson=lesson, source="generated", blueprint=blueprint)
+
+    def _apply_story_state(self, profile: ProfileSnapshot | None, student_id: str) -> ProfileSnapshot | None:
+        state = self._session_repo.get_story_state(student_id)
+        if not state:
+            return profile
+        if profile is None:
+            profile = ProfileSnapshot(student_id=student_id)
+        profile.story_arc_key = str(state.get("arc_key") or profile.story_arc_key)
+        profile.story_chapter_key = str(state.get("chapter_key") or profile.story_chapter_key)
+        profile.story_episode_index = int(state.get("episode_index") or profile.story_episode_index or 1)
+        profile.story_last_choice_key = str(state.get("last_choice_key") or profile.story_last_choice_key)
+        profile.story_last_choice_tag = str(state.get("last_choice_tag") or profile.story_last_choice_tag)
+        profile.story_last_scene = str(state.get("last_scene") or profile.story_last_scene)
+        hooks = state.get("unresolved_hooks") or []
+        if hooks and isinstance(hooks, list):
+            profile.story_next_hook = str(hooks[0])
+        return profile

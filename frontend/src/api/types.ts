@@ -11,6 +11,30 @@ export type ComponentType =
   | "feed_panel"
   | "pet_reaction";
 
+export type TemplateId =
+  | "story_dialogue"
+  | "story_choice"
+  | "mission_briefing"
+  | "word_reveal"
+  | "word_in_scene"
+  | "listen_pick"
+  | "drag_match"
+  | "choice_battle"
+  | "sentence_puzzle"
+  | "speak_repeat"
+  | "reward_chest"
+  | "feed_pet_step"
+  | "episode_end";
+
+export interface GameStep {
+  step_id: string;
+  template_id: TemplateId;
+  title: string;
+  slots: Record<string, unknown>;
+  is_interactive?: boolean;
+  reward_on_complete?: Record<string, unknown>;
+}
+
 export interface LessonComponent {
   component_id: string;
   type: ComponentType;
@@ -29,6 +53,7 @@ export interface StoryCharacter {
 
 export interface StoryThread {
   arc_key: string;
+  chapter_key: string;
   episode_index: number;
   episode_title: string;
   recap: string;
@@ -57,6 +82,7 @@ export interface LessonPackage {
   vocab: string[];
   story: StoryThread;
   pages: LessonPage[];
+  steps?: GameStep[];
   reward_preview: Record<string, unknown>;
   focus_tags?: string[];
   teacher_note?: string;
@@ -77,6 +103,27 @@ export interface SessionBlockResult {
   duration_ms: number;
 }
 
+export interface StepResult {
+  step_id: string;
+  template_id: string;
+  correct: boolean | null;
+  score: number;
+  duration_ms: number;
+  details: Record<string, unknown>;
+}
+
+export interface LearningEvent {
+  event_id: string;
+  session_id: string;
+  student_id: string;
+  lesson_id?: string;
+  step_id?: string;
+  template_id?: string;
+  event_type: string;
+  payload: Record<string, unknown>;
+  timestamp?: string;
+}
+
 export interface SessionCompleteResponse {
   status: string;
   next_recommendation: Record<string, unknown>;
@@ -92,14 +139,24 @@ export interface PetSummary {
   weight: number;
   affection: number;
   growth_stage: number;
+  growth_exp: number;
+  emotion_state: string;
   coins: number;
   food_inventory: Record<string, number>;
+  equipped_items: string[];
 }
 
 export interface PetFeedResponse {
   status: string;
   pet: PetSummary;
   growth_delta: Record<string, number>;
+}
+
+export interface ShopPurchaseResponse {
+  status: string;
+  pet: PetSummary;
+  spent_coins: number;
+  purchased_food: Record<string, number>;
 }
 
 export interface AdminMetricCard {

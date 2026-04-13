@@ -21,6 +21,19 @@ CREATE TABLE IF NOT EXISTS sessions (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS session_steps (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id TEXT NOT NULL,
+    lesson_id TEXT NOT NULL,
+    step_id TEXT NOT NULL,
+    template_id TEXT NOT NULL,
+    correct INTEGER,
+    score INTEGER NOT NULL DEFAULT 0,
+    duration_ms INTEGER NOT NULL DEFAULT 0,
+    details_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS profiles (
     student_id TEXT PRIMARY KEY,
     profile_json TEXT NOT NULL,
@@ -42,8 +55,63 @@ CREATE TABLE IF NOT EXISTS cost_events (
     created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS learning_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    student_id TEXT NOT NULL,
+    lesson_id TEXT NOT NULL DEFAULT '',
+    step_id TEXT NOT NULL DEFAULT '',
+    template_id TEXT NOT NULL DEFAULT '',
+    event_type TEXT NOT NULL,
+    payload_json TEXT NOT NULL DEFAULT '{}',
+    event_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS vocab_mastery (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id TEXT NOT NULL,
+    vocab_key TEXT NOT NULL,
+    attempts INTEGER NOT NULL DEFAULT 0,
+    correct_count INTEGER NOT NULL DEFAULT 0,
+    wrong_count INTEGER NOT NULL DEFAULT 0,
+    last_result_correct INTEGER NOT NULL DEFAULT 0,
+    last_score INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(student_id, vocab_key)
+);
+
+CREATE TABLE IF NOT EXISTS story_state (
+    student_id TEXT PRIMARY KEY,
+    arc_key TEXT NOT NULL DEFAULT 'snack_scouts',
+    chapter_key TEXT NOT NULL DEFAULT 'chapter_1',
+    episode_index INTEGER NOT NULL DEFAULT 1,
+    last_choice_key TEXT NOT NULL DEFAULT '',
+    last_choice_tag TEXT NOT NULL DEFAULT '',
+    unresolved_hooks_json TEXT NOT NULL DEFAULT '[]',
+    state_json TEXT NOT NULL DEFAULT '{}',
+    updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS story_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id TEXT NOT NULL,
+    lesson_id TEXT NOT NULL,
+    event_type TEXT NOT NULL,
+    event_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_sessions_student_created ON sessions(student_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_session_steps_student_created ON session_steps(student_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_session_steps_lesson ON session_steps(lesson_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_story_state_updated ON story_state(updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_story_events_student_created ON story_events(student_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_cost_events_category_created ON cost_events(category, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_learning_events_student_created ON learning_events(student_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_learning_events_session_created ON learning_events(session_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_vocab_mastery_student_wrong ON vocab_mastery(student_id, wrong_count DESC, updated_at DESC);
 """
 
 

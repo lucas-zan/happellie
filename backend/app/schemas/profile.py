@@ -46,8 +46,11 @@ class ProfileSnapshot(BaseModel):
     recommended_vocab_keys: list[str] = Field(default_factory=list)
     summary_note: str = ""
     story_arc_key: str = "snack_scouts"
+    story_chapter_key: str = "chapter_1"
     story_episode_index: int = 0
     story_last_scene: str = ""
     story_next_hook: str = ""
     story_characters: list[str] = Field(default_factory=list)
+    story_last_choice_key: str = ""
+    story_last_choice_tag: str = ""
     updated_at: str = ""

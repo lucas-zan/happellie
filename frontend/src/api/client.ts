@@ -1,4 +1,4 @@
-import type { AdminOverview, LessonResponse, PetFeedResponse, PetSummary, SessionCompleteResponse } from "./types";
+import type { AdminOverview, LearningEvent, LessonResponse, PetFeedResponse, PetSummary, SessionCompleteResponse, ShopPurchaseResponse } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000/api/v1";
 
@@ -18,7 +18,10 @@ export const apiClient = {
   health: () => request<{ status: string }>("/health"),
   nextLesson: (payload: unknown) => request<LessonResponse>("/lessons/next", { method: "POST", body: JSON.stringify(payload) }),
   completeSession: (payload: unknown) => request<SessionCompleteResponse>("/sessions/complete", { method: "POST", body: JSON.stringify(payload) }),
+  recordEvents: (payload: { student_id: string; session_id: string; events: LearningEvent[] }) =>
+    request<{ status: string; saved_count: number }>("/sessions/events", { method: "POST", body: JSON.stringify(payload) }),
   getPet: (studentId: string) => request<PetSummary>(`/pets/${studentId}`),
   feedPet: (payload: unknown) => request<PetFeedResponse>("/pets/feed", { method: "POST", body: JSON.stringify(payload) }),
+  buyFood: (payload: unknown) => request<ShopPurchaseResponse>("/pets/shop/buy-food", { method: "POST", body: JSON.stringify(payload) }),
   adminOverview: () => request<AdminOverview>("/admin/overview"),
 };

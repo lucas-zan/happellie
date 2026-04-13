@@ -69,6 +69,9 @@ export function PetPage() {
         <>
           <PetAvatarCard pet={pet} />
           <PetStatsPanel pet={pet} />
+          <StatusMessage tone="info">
+            Emotion: {pet.emotion_state} · EXP: {pet.growth_exp}/100 · Equipped: {pet.equipped_items.length ? pet.equipped_items.join(', ') : 'none'}
+          </StatusMessage>
           <PetCarePanel foodCount={pet.food_inventory.basic_food ?? 0} onFeed={feed} feedDisabled={(pet.food_inventory.basic_food ?? 0) <= 0} />
         </>
       )}

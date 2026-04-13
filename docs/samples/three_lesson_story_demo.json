@@ -1,0 +1,205 @@
+{
+  "student_id": "student-story-demo",
+  "episodes": [
+    {
+      "episode_run": 1,
+      "lesson_id": "lesson-f35ea170",
+      "story": {
+        "arc_key": "snack_scouts",
+        "episode_index": 1,
+        "episode_title": "Episode 1: The Apple Snack Rescue",
+        "recap": "Ellie started a tiny snack adventure.",
+        "current_mission": "Find the apple snack before Crumb Goblin reaches the garden.",
+        "next_hook": "Next time, Ellie and Momo Fox will cross the moon bridge to find a new snack.",
+        "characters": [
+          {
+            "character_id": "pet_ellie",
+            "name": "Ellie",
+            "kind": "pet",
+            "role": "hero pet",
+            "mood": "brave"
+          },
+          {
+            "character_id": "companion_1",
+            "name": "Momo Fox",
+            "kind": "animal",
+            "role": "forest helper",
+            "mood": "cheerful"
+          },
+          {
+            "character_id": "monster_1",
+            "name": "Crumb Goblin",
+            "kind": "monster",
+            "role": "snack thief",
+            "mood": "sneaky"
+          }
+        ]
+      },
+      "step_templates": [
+        "story_dialogue",
+        "story_choice",
+        "word_reveal",
+        "listen_pick",
+        "drag_match",
+        "choice_battle",
+        "reward_chest",
+        "feed_pet_step",
+        "episode_end"
+      ],
+      "selected_story_choice": {
+        "chosen_key": "fruit_path",
+        "chosen_text": "Go to the fruit trees",
+        "consequence_tag": "safe_food"
+      },
+      "next_recommendation": {
+        "lesson_type": "pet_feeding",
+        "focus": [
+          "apple",
+          "food"
+        ],
+        "theme": [
+          "feed_rabbit"
+        ],
+        "recommended_vocab_keys": [
+          "apple"
+        ],
+        "story_arc_key": "snack_scouts",
+        "story_episode_index": 1,
+        "story_next_hook": "Because of the safe_food choice, a new challenge appears next lesson."
+      }
+    },
+    {
+      "episode_run": 2,
+      "lesson_id": "lesson-a1bcc694",
+      "story": {
+        "arc_key": "snack_scouts",
+        "episode_index": 2,
+        "episode_title": "Episode 2: The Apple Snack Rescue",
+        "recap": "Because of the safe_food choice, a new challenge appears next lesson.",
+        "current_mission": "Continue the chosen branch and find the apple snack before Crumb Goblin appears.",
+        "next_hook": "Recent branch: Go to the fruit trees (safe_food). Next time, Ellie and Momo Fox discover a hidden shortcut.",
+        "characters": [
+          {
+            "character_id": "pet_ellie",
+            "name": "Ellie",
+            "kind": "pet",
+            "role": "hero pet",
+            "mood": "brave"
+          },
+          {
+            "character_id": "companion_1",
+            "name": "Momo Fox",
+            "kind": "animal",
+            "role": "forest helper",
+            "mood": "cheerful"
+          },
+          {
+            "character_id": "monster_1",
+            "name": "Crumb Goblin",
+            "kind": "monster",
+            "role": "snack thief",
+            "mood": "sneaky"
+          }
+        ]
+      },
+      "step_templates": [
+        "story_dialogue",
+        "story_choice",
+        "word_reveal",
+        "listen_pick",
+        "drag_match",
+        "choice_battle",
+        "reward_chest",
+        "feed_pet_step",
+        "episode_end"
+      ],
+      "selected_story_choice": {
+        "chosen_key": "cave_path",
+        "chosen_text": "Explore the tiny cave",
+        "consequence_tag": "adventure"
+      },
+      "next_recommendation": {
+        "lesson_type": "pet_feeding",
+        "focus": [
+          "apple"
+        ],
+        "theme": [
+          "feed_rabbit"
+        ],
+        "recommended_vocab_keys": [
+          "apple"
+        ],
+        "story_arc_key": "snack_scouts",
+        "story_episode_index": 2,
+        "story_next_hook": "Because of the adventure choice, a new challenge appears next lesson."
+      }
+    },
+    {
+      "episode_run": 3,
+      "lesson_id": "lesson-1b25cebe",
+      "story": {
+        "arc_key": "snack_scouts",
+        "episode_index": 3,
+        "episode_title": "Episode 3: The Apple Snack Rescue",
+        "recap": "Because of the adventure choice, a new challenge appears next lesson.",
+        "current_mission": "Continue the chosen branch and find the apple snack before Crumb Goblin appears.",
+        "next_hook": "Recent branch: Explore the tiny cave (adventure). Next time, Ellie and Momo Fox discover a hidden shortcut.",
+        "characters": [
+          {
+            "character_id": "pet_ellie",
+            "name": "Ellie",
+            "kind": "pet",
+            "role": "hero pet",
+            "mood": "brave"
+          },
+          {
+            "character_id": "companion_1",
+            "name": "Momo Fox",
+            "kind": "animal",
+            "role": "forest helper",
+            "mood": "cheerful"
+          },
+          {
+            "character_id": "monster_1",
+            "name": "Crumb Goblin",
+            "kind": "monster",
+            "role": "snack thief",
+            "mood": "sneaky"
+          }
+        ]
+      },
+      "step_templates": [
+        "story_dialogue",
+        "story_choice",
+        "word_reveal",
+        "listen_pick",
+        "drag_match",
+        "choice_battle",
+        "reward_chest",
+        "feed_pet_step",
+        "episode_end"
+      ],
+      "selected_story_choice": {
+        "chosen_key": "both",
+        "chosen_text": "Check both quickly",
+        "consequence_tag": "balanced"
+      },
+      "next_recommendation": {
+        "lesson_type": "pet_feeding",
+        "focus": [
+          "apple",
+          "food"
+        ],
+        "theme": [
+          "feed_rabbit"
+        ],
+        "recommended_vocab_keys": [
+          "apple"
+        ],
+        "story_arc_key": "snack_scouts",
+        "story_episode_index": 3,
+        "story_next_hook": "Because of the balanced choice, a new challenge appears next lesson."
+      }
+    }
+  ]
+}

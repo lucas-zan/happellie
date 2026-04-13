@@ -4,6 +4,7 @@ from collections import Counter
 from uuid import uuid4
 
 from app.domain.interfaces.planning import LessonPlanner
+from app.infra.planning.story_arc_library import chapter_by_episode, resolve_arc
 from app.schemas.lesson import LessonBlueprint, LessonBlueprintPage, LessonRequest, StoryCharacter, StoryThread, VocabItem
 from app.schemas.profile import ProfileSnapshot
 
@@ -21,6 +22,7 @@ class RulesLessonPlanner(LessonPlanner):
         title = self._build_title(theme, target_vocab)
         rewards = {"coins": max(3, len(target_vocab) + 1), "food": max(1, len(target_vocab) // 2 or 1)}
         story = self._build_story(profile, target_vocab)
+        # NOTE: blueprint pages remain for legacy page-based generator and caching.
         pages = [
             LessonBlueprintPage(
                 page_id="p1",
@@ -108,6 +110,12 @@ class RulesLessonPlanner(LessonPlanner):
                 VocabItem(key="hungry", text="hungry", meaning="饿的", category="feeling"),
             ]
 
+        if profile and profile.recommended_vocab_keys:
+            preferred = {item.strip().lower() for item in profile.recommended_vocab_keys if item.strip()}
+            selected = [item for item in available_vocab if item.key.lower() in preferred or item.text.lower() in preferred]
+            if len(selected) >= 3:
+                return selected[:4]
+
         preferred_categories = list(profile.weak_vocab_tags if profile else [])
         if not preferred_categories and profile and profile.latest_focus:
             preferred_categories = profile.latest_focus
@@ -135,24 +143,60 @@ class RulesLessonPlanner(LessonPlanner):
         return mapping.get(theme, f"HappyEllie lesson: {lead}")
 
     def _build_story(self, profile: ProfileSnapshot | None, selected: list[VocabItem]) -> StoryThread:
-        arc_key = profile.story_arc_key if profile and profile.story_arc_key else "snack_scouts"
+        arc_key = self._resolve_arc_key(profile)
+        arc = resolve_arc(arc_key)
         episode_index = (profile.story_episode_index + 1) if profile and profile.story_episode_index else 1
+        chapter_key = chapter_by_episode(arc, episode_index)
         lead = selected[0].text if selected else "apple"
-        companion_name = "Momo Fox" if arc_key == "snack_scouts" else "Pip Owl"
-        monster_name = "Crumb Goblin" if arc_key == "snack_scouts" else "Misty Pollen Bug"
-        recap = profile.story_next_hook or profile.story_last_scene or "Ellie started a tiny snack adventure."
-        current_mission = f"Find the {lead} snack before {monster_name} reaches the garden."
-        next_hook = f"Next time, Ellie and {companion_name} will cross the moon bridge to find a new snack."
+        companion_name = arc.companion_name
+        monster_name = arc.monster_name
+        recap = (
+            profile.story_next_hook
+            if profile and profile.story_next_hook
+            else profile.story_last_scene
+            if profile and profile.story_last_scene
+            else arc.intro_recap
+        )
+        branch_tag = profile.story_last_choice_tag if profile and profile.story_last_choice_tag else ""
+        branch_key = profile.story_last_choice_key if profile and profile.story_last_choice_key else ""
+        if branch_tag:
+            if branch_tag == "adventure":
+                current_mission = f"Take the cave path and find the {lead} clue before {monster_name} appears."
+                next_hook = f"{chapter_key} unlocked: cave route reveals a hidden gate. Ellie and {companion_name} hear strange footsteps."
+            elif branch_tag == "safe_food":
+                current_mission = f"Follow the fruit path and protect the {lead} snacks from {monster_name}."
+                next_hook = f"{chapter_key} unlocked: fruit path leads to a tiny orchard map. A new helper may join next lesson."
+            else:
+                current_mission = f"Continue the chosen branch and find the {lead} snack before {monster_name} appears."
+                next_hook = f"Branch '{branch_tag}' changes the route. Ellie and {companion_name} discover a hidden shortcut."
+        else:
+            current_mission = f"Find the {lead} snack before {monster_name} reaches the garden."
+            next_hook = f"Next time, Ellie and {companion_name} will cross the moon bridge to find a new snack."
         return StoryThread(
             arc_key=arc_key,
+            chapter_key=chapter_key,
             episode_index=episode_index,
-            episode_title=f"Episode {episode_index}: The {lead.title()} Snack Rescue",
+            episode_title=f"{arc.arc_title} · Episode {episode_index}: The {lead.title()} Snack Rescue",
             recap=recap,
             current_mission=current_mission,
             next_hook=next_hook,
+            last_choice_key=branch_key,
+            last_choice_tag=branch_tag,
             characters=[
                 StoryCharacter(character_id="pet_ellie", name="Ellie", kind="pet", role="hero pet", mood="brave"),
                 StoryCharacter(character_id="companion_1", name=companion_name, kind="animal", role="forest helper", mood="cheerful"),
                 StoryCharacter(character_id="monster_1", name=monster_name, kind="monster", role="snack thief", mood="sneaky"),
             ],
         )
+
+    def _resolve_arc_key(self, profile: ProfileSnapshot | None) -> str:
+        if profile and profile.story_arc_key:
+            return profile.story_arc_key
+        if not profile:
+            return "snack_scouts"
+        joined = " ".join([*profile.interest_tags, *profile.preferred_themes]).lower()
+        if "moon" in joined or "night" in joined:
+            return "moon_garden"
+        if "ocean" in joined or "sea" in joined:
+            return "ocean_picnic"
+        return "snack_scouts"

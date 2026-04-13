@@ -45,12 +45,12 @@ export function HomePage() {
       <div className="ui-grid ui-grid--cards">
         <Card>
           <CardContent>
-            <CardTitle>Start a lesson</CardTitle>
-            <CardDescription>Generate the next lesson package for a student.</CardDescription>
+            <CardTitle>Start a playable story game</CardTitle>
+            <CardDescription>Generate a step-based interactive lesson and play it like a mini game.</CardDescription>
           </CardContent>
           <CardFooter>
-            <Link to="/lesson">
-              <Button variant="secondary">Go to lesson</Button>
+            <Link to="/play">
+              <Button variant="secondary">Go to play</Button>
             </Link>
           </CardFooter>
         </Card>

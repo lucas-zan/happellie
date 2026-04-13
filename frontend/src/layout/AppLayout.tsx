@@ -4,7 +4,7 @@ import { cn } from '../utils/cn';
 
 const navItems = [
   { to: '/', label: 'Home', caption: 'overview' },
-  { to: '/lesson', label: 'Lesson', caption: 'learn' },
+  { to: '/play', label: 'Play', caption: 'game' },
   { to: '/pet', label: 'Pet', caption: 'care' },
   { to: '/admin', label: 'Admin', caption: 'measure' },
 ];
